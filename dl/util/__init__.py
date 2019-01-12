@@ -1,4 +1,4 @@
-from dl.util.buffer import ReplayBuffer
+from dl.util.buffer import ReplayBuffer, ReplayBufferBobby
 from dl.util.prioritized_buffer import PrioritizedReplayBuffer
 from dl.util.ckptr import Checkpointer
 from dl.util.monitor import *

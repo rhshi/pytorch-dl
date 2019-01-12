@@ -1,6 +1,6 @@
 from dl import Trainer
 from dl.modules import QFunction
-from dl.util import ReplayBuffer, PrioritizedReplayBuffer
+from dl.util import ReplayBuffer, ReplayBufferBobby, PrioritizedReplayBuffer
 from dl.util import logger, find_monitor, FrameStack, EpsilonGreedy
 from dl.eval import rl_evaluate, rl_record, rl_plot
 from baselines.common.schedules import LinearSchedule
