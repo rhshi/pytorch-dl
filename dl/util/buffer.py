@@ -63,11 +63,6 @@ class ReplayBuffer(object):
         rew_batch      = self.reward[idxes]
         done_mask      = np.array([1.0 if self.done[idx] else 0.0 for idx in idxes], dtype=np.float32)
         next_obs_batch = np.concatenate([self._encode_observation(idx + 1)[np.newaxis, :] for idx in idxes], 0)
-        next_act_batch = self.action[idx + 1 for idx in idxes]
-        next_rew_batch = self.reward[idx + 1 for idx in idxes]
-        next_done_mask = np.array([1.0 if self.done[idx + 1] else 0.0 for idx in idxes, dtype=np.float32])
-        next_next_obs_batch = np.concatenate([self._encode_observation(idx + 2)[np.newaxis, :] for idx in idxes], 0)
-        
 
         return obs_batch, act_batch, rew_batch, next_obs_batch, done_mask
 
@@ -77,7 +72,7 @@ class ReplayBuffer(object):
         i-th sample transition is the following:
         when observing `obs_batch[i]`, action `act_batch[i]` was taken,
         after which reward `rew_batch[i]` was received and subsequent
-        observation  next_obs_batch[i] was observed, unless the epsiode
+        observation  next_obs_batch[i] was observed, unless the episode
         was done which is represented by `done_mask[i]` which is equal
         to 1 if episode has ended as a result of that action.
         Parameters
@@ -212,7 +207,40 @@ class ReplayBuffer(object):
         self.num_in_buffer = state_dict['num_in_buffer']
         self.next_idx = state_dict['next_idx']
 
+class ReplayBufferBobby(ReplayBuffer):
+    def _encode_sample(self, idxes):
+        obs_batch      = np.concatenate([self._encode_observation(idx)[np.newaxis, :] for idx in idxes], 0)
+        act_batch      = self.action[idxes]
+        rew_batch      = self.reward[idxes]
+        done_mask      = np.array([1.0 if self.done[idx] else 0.0 for idx in idxes], dtype=np.float32)
+        next_obs_batch = np.concatenate([self._encode_observation(idx + 1)[np.newaxis, :] for idx in idxes], 0)
+        next_act_batch = self.action[idx + 1 for idx in idxes]
+        next_rew_batch = self.reward[idx + 1 for idx in idxes]
+        next_done_mask = np.array([1.0 if self.done[idx + 1] else 0.0 for idx in idxes, dtype=np.float32])
+        next_next_obs_batch = np.concatenate([self._encode_observation(idx + 2)[np.newaxis, :] for idx in idxes], 0)
 
+        return obs_batch, act_batch, rew_batch, done_mask, next_obs_batch, next_act_batch, next_rew_batch, next_done_mask, next_next_obs_batch
+
+    def sample(self, batch_size):
+        """Sample `batch_size` different transitions.
+        i-th sample transition is the following:
+        when observing `obs_batch[i]`, action `act_batch[i]` was taken,
+        after which reward `rew_batch[i]` was received and subsequent
+        observation  next_obs_batch[i] was observed, unless the next episode
+        was done which is represented by `done_mask[i]` which is equal
+        to 1 if episode has ended as a result of that action.  The next obs, act, rew,
+        and done are also returned to predict next_next_dynamics.
+        Parameters
+        ----------
+        batch_size: int
+            How many transitions to sample.
+        Returns
+        -------
+        _encode_sample: obs, ac, rew, done, next_obs, next_ac, next_rew, next_done, next_next_obs
+        """
+        assert self.can_sample(batch_size)
+        idxes = sample_n_unique(lambda: random.randint(0, self.num_in_buffer - 3), batch_size)
+        return self._encode_sample(idxes)
 
 
 """
