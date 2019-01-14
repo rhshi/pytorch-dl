@@ -1,3 +1,5 @@
+import gin
+
 """
     This file is apdated from https://github.com/berkeleydeeprlcourse/homework/tree/master/hw3
     Minor edits were made to allow for easier subclassing and changing the type of data stored.
@@ -16,6 +18,7 @@ def sample_n_unique(sampling_f, n):
             res.append(candidate)
     return res
 
+@gin.configurable
 class ReplayBuffer(object):
     def __init__(self, size, frame_history_len):
         """This is a memory efficient implementation of the replay buffer.
@@ -207,6 +210,7 @@ class ReplayBuffer(object):
         self.num_in_buffer = state_dict['num_in_buffer']
         self.next_idx = state_dict['next_idx']
 
+@gin.configurable
 class ReplayBufferBobby(ReplayBuffer):
     def _encode_sample(self, idxes):
         obs_batch      = np.concatenate([self._encode_observation(idx)[np.newaxis, :] for idx in idxes], 0)

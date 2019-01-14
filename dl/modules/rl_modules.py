@@ -13,7 +13,7 @@ The constructors for these modules generally take as input:
     obs_shape (tuple):
             the shape of the observation space of the environment
     action_space (gym.Space):
-            the action space of the enironment
+            the action space of the environment
     base (nn.Module):
             the base module whose output is the features used by the
             QFunction or Policy. These modules place minor assumptions
