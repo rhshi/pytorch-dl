@@ -214,9 +214,9 @@ class ReplayBufferBobby(ReplayBuffer):
         rew_batch      = self.reward[idxes]
         done_mask      = np.array([1.0 if self.done[idx] else 0.0 for idx in idxes], dtype=np.float32)
         next_obs_batch = np.concatenate([self._encode_observation(idx + 1)[np.newaxis, :] for idx in idxes], 0)
-        next_act_batch = self.action[idx + 1 for idx in idxes]
-        next_rew_batch = self.reward[idx + 1 for idx in idxes]
-        next_done_mask = np.array([1.0 if self.done[idx + 1] else 0.0 for idx in idxes, dtype=np.float32])
+        next_act_batch = self.action[[idx + 1 for idx in idxes]]
+        next_rew_batch = self.reward[[idx + 1 for idx in idxes]]
+        next_done_mask = np.array([1.0 if self.done[idx + 1] else 0.0 for idx in idxes], dtype=np.float32)
         next_next_obs_batch = np.concatenate([self._encode_observation(idx + 2)[np.newaxis, :] for idx in idxes], 0)
 
         return obs_batch, act_batch, rew_batch, done_mask, next_obs_batch, next_act_batch, next_rew_batch, next_done_mask, next_next_obs_batch
